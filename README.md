@@ -1,7 +1,7 @@
 #Futures and Promises
 This is a rubymotion implementation of the Futures and Promise pattern, on top of Grand Central [Dispatch](https://github.com/MacRuby/MacRuby/wiki/Dispatch-Module).
 
-##What are Future and Promises?
+##What are Futures and Promises?
 
 > In computer science, future, promise, and delay refer to constructs used for 
 > synchronizing in some concurrent programming languages. They describe an object 
@@ -72,7 +72,9 @@ end
 ###Module Futuristic
 ```ruby
 class Request
+
   include Dispatch::Futuristic
+  
   def long_taking_computation
   	sleep 10
   	42
