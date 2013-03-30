@@ -1,7 +1,7 @@
 #Futures and Promises
 This is a rubymotion implementation of the Futures and Promise pattern, on top of Grand Central [Dispatch](https://github.com/MacRuby/MacRuby/wiki/Dispatch-Module).
 
-##What are Future and Promises?
+##What are Futures and Promises?
 
 > In computer science, future, promise, and delay refer to constructs used for 
 > synchronizing in some concurrent programming languages. They describe an object 
@@ -10,13 +10,14 @@ This is a rubymotion implementation of the Futures and Promise pattern, on top o
 
 
 ##Futures and Promises
-are objects holding a value which may become available at some point. This value is usually the result of some other computation. Since this computation may fail with an exception, the Future/Promise may also hold an exception in case the computation throws one.
+are objects holding a value which may become available at some point. This value is usually the result of some other computation. Since this computation may fail with an exception, the Future may also hold an exception in case the computation throws one.
 
 #Usage:
+
 in your Gem file
 
 ```ruby
-gem 'futuristic', :git => 'git://github.com/seanlilmateus/futuristic.git'
+gem 'futuristic'
 
 ```
 ###how to use Promises
@@ -71,7 +72,9 @@ end
 ###Module Futuristic
 ```ruby
 class Request
+
   include Dispatch::Futuristic
+  
   def long_taking_computation
   	sleep 10
   	42
@@ -93,4 +96,3 @@ p computation.value  # =>  42
 - Parallel Enumerable 
 - Actor models
 - documentation and examples
-
