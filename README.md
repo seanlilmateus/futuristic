@@ -1,22 +1,25 @@
 #Futures and Promises
-This is a rubymotion implementation of the future, promise pattern on top of Rubymotion/MacRuby Dispatch Module.
+This is a rubymotion implementation of the Futures and Promise pattern, on top of Grand Central [Dispatch](https://github.com/MacRuby/MacRuby/wiki/Dispatch-Module).
 
-Promise and Futures both transparently defer the execution of a block. Promises evaluate the given block if and when its result is first needed. Futures evaluate the given block optimistically in another [Dispatch::Queue](https://github.com/MacRuby/MacRuby/wiki/Dispatch-Module).
+##What are Future and Promises?
+
+> In computer science, future, promise, and delay refer to constructs used for 
+> synchronizing in some concurrent programming languages. They describe an object 
+> that acts as a proxy for a result that is initially unknown, usually because the 
+> computation of its value is yet incomplete<[source Wikipedia](http://en.wikipedia.org/wiki/Futures_and_promises)>.
 
 
-
-##Future and Promose
-are objects holding a value which may become available at some point. This value is usually the result of some other computation. Since this computation may fail with an exception, the Future may also hold an exception in case the computation throws one.
+##Futures and Promises
+are objects holding a value which may become available at some point. This value is usually the result of some other computation. Since this computation may fail with an exception, the Future/Promise may also hold an exception in case the computation throws one.
 
 #Usage:
-
-on your Gem file
+in your Gem file
 
 ```ruby
 gem 'futuristic', :git => 'git://github.com/seanlilmateus/futuristic.git'
 
 ```
-###example using Promise
+###how to use Promises
 ```ruby
 def fibonacci(n)
   return n if n < 2
@@ -24,9 +27,11 @@ def fibonacci(n)
   fib2 = Dispatch::Promise.new { fibonacci(n-2) }
   fib1 + fib2
 end
+
+p fibonacci(10) # => 55
 ```
 
-###example using Futures
+###how to use Futures
 
 ```ruby
 # computation is started
@@ -88,3 +93,4 @@ p computation.value  # =>  42
 - Parallel Enumerable 
 - Actor models
 - documentation and examples
+
