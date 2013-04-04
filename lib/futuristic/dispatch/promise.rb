@@ -1,6 +1,6 @@
 module Dispatch
   class Promise < BasicObject
-    # new :: Promise a -> Eval a
+    # new :: a -> Promise b
     # MacRuby and Rubymotion BasicObject#initialize doesn't like blocks, so we have to do this
     def self.new(&block)
       unless block_given?

@@ -10,9 +10,9 @@ module Dispatch
     #   => future.value # 10
     # Arguments
     #    block, last
+    # new :: a -> Future b
     def self.new(&block)
       # MacRuby and Rubymotion BasicObject#initialize doesn't like blocks, so we have to do this
-      # new :: a -> Eval (Future a)
       unless block_given?
         ::Kernel.raise(::ArgumentError, "You cannot initalize a Dispatch::Future without a block")
       end

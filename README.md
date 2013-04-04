@@ -96,7 +96,3 @@ p computation.value  # =>  42
 - Parallel Enumerable 
 - Actor models
 - documentation and examples
-<<<<<<< HEAD
-=======
-
->>>>>>> ff0379c36a08e8d3b717bdf894f1055b128f4a11
