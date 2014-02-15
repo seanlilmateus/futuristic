@@ -3,18 +3,21 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'futuristic/version'
 
-Gem::Specification.new do |gem|
-  gem.name          = 'futuristic'
-  gem.version       = Futuristic::VERSION
-  gem.date          = '2013-03-21'
-  gem.summary       = %q{Rubymotion Promise and Futures}
-  gem.description   = %q{Rubymotion Promise and Futures helper on top of Grand Central Dispatch}
-  gem.authors       = ["Mateus Armando"]
-  gem.email         = 'seanlilmateus@yahoo.de'
-  gem.files         = ["lib/futuristic.rb"]
-  gem.homepage      = 'http://github.com/seanlilmateus/futuristic'
-  gem.files         = `git ls-files`.split($/)
-  gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.require_paths = ["lib"]
+Gem::Specification.new do |s|
+  s.name          = 'futuristic'
+  s.version       = Futuristic::VERSION
+  s.date          = '2014-02-15'
+  s.summary       = 'A Collection of RubyMotion Concurrency Helpers'
+  s.description   = 'A Collection of RubyMotion Concurrency Helpers such as Promise, Future and Dispatch'
+  s.authors       = ["Mateus Armando"]
+  s.email         = 'seanlilmateus@yahoo.de'
+  s.files         = ["lib/futuristic.rb"]
+  s.homepage      = 'http://github.com/seanlilmateus/futuristic'
+  s.license  = 'MIT'
+  s.files         = `git ls-files`.split($\)
+  s.test_files    = s.files.grep(%r{^(test|spec|features)/})
+  s.require_paths = ['lib']
+
+  s.add_runtime_dependency 'motion-require', '~> 0.0', '>= 0.0.6'
+  s.add_development_dependency 'rake', '~> 0'
 end
