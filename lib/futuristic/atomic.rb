@@ -3,7 +3,7 @@ motion_require './promise/promise'
 module Dispatch # Atomic
   class Atomic < BasicObject
 
-    def self.new(object)
+    def self.new(object=nil)
       instance = alloc.initWithObject(object)
     end
 

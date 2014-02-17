@@ -15,6 +15,7 @@ module Dispatch # Future
     end
 
     def initialize(*args, &block)
+      raise "Futures can't be initialized without blocks" unless block_given?
       @promise = Promise.new
       execute(*args, &block)
     end

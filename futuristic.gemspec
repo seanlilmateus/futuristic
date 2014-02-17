@@ -8,12 +8,13 @@ Gem::Specification.new do |s|
   s.version       = Futuristic::VERSION
   s.date          = '2014-02-15'
   s.summary       = 'A Collection of RubyMotion Concurrency Helpers'
-  s.description   = 'A Collection of RubyMotion Concurrency Helpers such as Promise, Future and Dispatch'
-  s.authors       = ["Mateus Armando"]
+  s.description   = 'RubyMotion Concurrency Helpers such as Promise, Future and Atomic'
+  s.authors       = ['Mateus Armando']
   s.email         = 'seanlilmateus@yahoo.de'
-  s.files         = ["lib/futuristic.rb"]
+
+  s.files         = ['lib/futuristic.rb']
   s.homepage      = 'http://github.com/seanlilmateus/futuristic'
-  s.license  = 'MIT'
+  s.license       = 'MIT'
   s.files         = `git ls-files`.split($\)
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ['lib']
