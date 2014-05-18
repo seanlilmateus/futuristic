@@ -3,7 +3,7 @@ motion_require './promise/promise'
 module Dispatch # Channel
   class Channel
     def initialize
-      @queue = Atomic.new([])
+      @queue   = Atomic.new([])
       @pending = Atomic.new([])
     end
     
@@ -13,7 +13,6 @@ module Dispatch # Channel
         @pending << @promise
       else
         promise = @queue.shift
-        promise
       end
       promise.sync
     end
@@ -27,7 +26,7 @@ module Dispatch # Channel
       end
       promise
     end
-    # alias recv take
+    alias recv take
 
     def put(value)
       if @pending.empty?
@@ -39,7 +38,7 @@ module Dispatch # Channel
       end
       promise
     end
-    # alias << put
+    alias << put
 
     def drain(error)
       until @queue.empty?

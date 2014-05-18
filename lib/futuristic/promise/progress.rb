@@ -7,7 +7,6 @@ module Dispatch # Progress
         @on_progress << block if block_given?
         @on_progress
       end
-
       def progress(status)
         if pending?
           on_progress.each { |block| block.call(status) }

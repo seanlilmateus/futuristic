@@ -85,7 +85,7 @@ shared "A Promise" do
   
   it "should be thread safe" do
     x = @method.call { res = 1; 3.times { res = res * 5 ; sleep 1 } ; res }
-    results = []
+    results  = []
     changeds = []
     changed = false
     Dispatch::Queue.new('future.rspec').apply(10) do |idx|

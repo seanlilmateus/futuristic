@@ -1,17 +1,10 @@
-motion_require './promise/promise'
+motion_require './blank_slate'
 
 module Dispatch # Atomic
-  class Atomic < BasicObject
-
-    def self.new(object=nil)
-      instance = alloc.initWithObject(object)
-    end
-
-    def initWithObject(object)
-      init
+  class Atomic < BlankSlate
+    def initialize(object)
       @object = object
-      @queue = ::Dispatch::Queue.new "#{@object.object_id}-de.mateus.synchronized.proxy"
-      self
+      @queue = Queue.new("de.mateus.futuristic.atomic.#{@object.object_id}")
     end
 
     def update
@@ -33,23 +26,24 @@ module Dispatch # Atomic
         options = args.find { |arg| arg.is_a?(::Hash) }
 
         if options
-          selector  = options.keys.unshift(m).map { |txt| txt.to_s.appendString(':') }.join   
+          selector  = options.keys.unshift(m).map { |txt| txt.to_s + ':' }.join   
           arguments = options.values.unshift(args.first)
         end
 
         target = @object
-        ret_value = if selector && target.respond_to?(selector)
-          target.__send__(selector, *arguments, &blk)
+        ret_value = if selector && target.respond_to?(selector)          
+          target.public_send(selector, *arguments, &blk)
         elsif target.respond_to?(m)
-          target.__send__(m, *args, &blk)
+          target.public_send(m, *args, &blk)
+        else
+          super
         end
         return ret_value
       end
     end
 
     def inspect
-      description.gsub(/Atomic/, "#{self.class} [#{@object.class}]")
+      description.gsub(/Atomic/, "#{self.class} [#@object]")
     end
-
   end
 end

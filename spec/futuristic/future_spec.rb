@@ -1,6 +1,8 @@
 describe Dispatch::Future do
+  
+  before { @method = Dispatch::Future.method(:new) }
 
-  before { @method = Kernel.method(:future) }
+  # Kernel.method(:future) }
   
   it "should inherit from BasicObject if available, and not otherwise" do
     Dispatch::Future.ancestors.should.include BasicObject

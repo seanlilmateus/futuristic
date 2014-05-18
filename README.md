@@ -12,87 +12,91 @@ This is a rubymotion implementation of the Futures and Promise pattern, on top o
 ##Futures and Promises
 are objects holding a value which may become available at some point. This value is usually the result of some other computation. Since this computation may fail with an exception, the Future may also hold an exception in case the computation throws one.
 
-#Usage:
-
-in your Gem file
-
-```ruby
-gem 'futuristic'
-
-```
-###how to use Promises
-```ruby
-def fibonacci(n)
-  return n if n < 2
-  fib1 = Dispatch::Promise.new { fibonacci(n-1) }
-  fib2 = Dispatch::Promise.new { fibonacci(n-2) }
-  fib1 + fib2
-end
-
-p fibonacci(10) # => 55
-```
-
-###how to use Futures
+# Usage
+# Promises
+On this version, we have rewritten the Promises from scratch,
+we throw the whole code away! and start by reusing the code from [lgierth](https://github.com/lgierth),
+which means Futuristic now shares the Promises/A+ implementation of [promise.rb](https://github.com/lgierth/promise.rb) an full Promises/A(+) implementation for Ruby.
+Nevertheless with had to do some changes, but it both Projects should be compatible.
 
 ```ruby
-# computation is started
-future_data = Dispatch::Future.new do
-	bundle	= NSBundle.mainBundle
-	plist_path = bundle.pathForResource("map", ofType: "plist")
-	@map_data = load_plist(File.read(plist_path))
-end
 
-# you can do something else
-@table = create_table_named("Future Maps")
+@client = AFMotion::... # create your client
 
-puts "Hello World"
+def http_get(url)
+  promise = Dispatch::Promise.new
 
-@table.data = future_data.value # if the computation is done, results with be immediatelly returned, if not done yet it will wait.
-```
-
-###Futures using callback
-```ruby
-# computation is started
-future_data = Dispatch::Future.new do
-	bundle	= NSBundle.mainBundle
-	plist_path = bundle.pathForResource("map", ofType: "plist")
-	@map_data = load_plist(File.read(plist_path))
-end
-
-# you can do something else
-@table = create_table_named("Future Maps")
-
-future_data.when_done do |value|
-	# when the computation is done, table data will be setted on the Future Queue
-	# the call back is not executed on the MainQueue/Dispatch::Queue.main
-	@table.data = future_data.value
-end
-```
-
-###Module Futuristic
-```ruby
-class Request
-
-  include Dispatch::Futuristic
-  
-  def long_taking_computation
-  	sleep 10
-  	42
+  AFMotion::HTTP.get("http://google.com") do |result|
+    if result.success?
+      result.fulfill(result.body)
+    elsif result.failure?
+      result.reject(result.error.localizedDescription)
+    end
   end
+  promise
 end
 
-request = Request.new
-computation = request.future.long_taking_computation
+# 1. options
+response = http_get(url).async
 
-#you can do something else while the computation is been executed on a background queue
-puts "Drink some Kölsch"
+# 2. options
+success = Proc.new { |value| success value }
+failure = Proc.new { |reason| failure reason }
+http_get(url).then(success, failure)
 
-# now you need the result, if it's already finished
-# you will ge the result, otherwise it will wait untill the computation finish
-p computation.value  # =>  42
+# 3. options
+http_get(url).then(&method(:success), &method(:failure))
 ```
 
-#Todo
-- Parallel Enumerable 
-- Actor models
-- documentation and examples
+For more Information you can visit the [promise.rb's pages](https://github.com/lgierth/promise.rb)
+
+
+### particular Features
+you can call Promise#sync to wait until the Promise is fulfilled or failed
+
+##Futures
+```ruby
+# computation is started
+future = Dispatch::Future.new do
+  bundle  = NSBundle.mainBundle
+  plist_path = bundle.pathForResource("map", ofType: "plist")
+  load_plist(File.read(plist_path))
+end
+
+# in the meanwhile you can do something else...
+@table = create_table_named("Future Maps")
+
+@table.data = future.value
+```
+
+additional to this you can, wait for multiple promises to "be done"
+
+```ruby
+
+f1 = Dispatch::Future.new { get_page('api/pages') }
+f2 = Dispatch::Future.new { get_page('api/pagecategories') }
+Dispatch::Future.reduce do	|v1, v2|
+  render(v1, v2)
+end
+```
+---
+# Atomic
+This Class provides an Atomic Object that guarantees atomic updates to its contained value.
+It provides an accessor for the contained `value` and an update method:
+
+### Usage
+
+*****
+
+```ruby
+atomic_number = Dispatch::Atomic.new(0)
+atomic_number.value # => 0
+
+atomic_number.update { |v| v + 1 }
+atomic_number.value # => 1
+
+Dispatch::Queue.concurrent.apply(1000) do |idx|
+  atomic_number.update { |v| v + idx }
+end
+atomic_number.value # => result 
+```

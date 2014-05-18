@@ -1,50 +1,57 @@
+motion_require './blank_slate'
 motion_require './promise/promise'
 
 module Dispatch # Future
-  class Future
-
-    def self.reduce(*futures, &block)
-      raise 'block not given' unless block_given?
-      promise = Promise.new
-      Dispatch::Queue.concurrent(:high).async do
-        futures = futures.flatten
-        result = block.(*futures.map(&:value))
-        promise.fulfill(result)
-      end
-      promise
-    end
-
-    def initialize(*args, &block)
-      raise "Futures can't be initialized without blocks" unless block_given?
-      @promise = Promise.new
+  class Future < BlankSlate
+    def initialize(promise = Promise.new, *args, &block)
+      raise "Futures can't be initialized without blocks" unless ::Kernel.block_given?
+      @promise = promise
+      @group = Group.new
+      @queue = Queue.new "de.mateus.futuristic.queue.#{@promise.object_id}"
       execute(*args, &block)
     end
 
     attr_reader :promise
-
-    def method_missing(meth, *args, &blk)
-      promise.send(meth, *args, &blk)
+    
+    def wait(timeout=TIME_FOREVER)
+      promise.send(:wait, timeout)
+    end
+    
+    def value
+      @promise.value
     end
 
+    def inspect
+      description.gsub(/Dispatch::Future/, "#{self.class} @state=#{promise.state}")      
+    end
+    
+    def on_success(&block)
+      self.promise.then(&block)
+    end
+    
+    def on_failure(&block)
+      self.promise.catch(&block)
+    end
+    
+    def on_complete(&block)
+      @group.notify(@queue) do
+        ret = self.promise.value || self.promise.reason
+        block.call(*ret) 
+      end
+    end
+
+    private
+
     def execute(*args, &block)
-      queue = Queue.new "de.mateus.future.queue.#{object_id}"
-      queue.async do
+      @queue.async(@group) do
         begin
           result = block.call(*args)
           @promise.fulfill(result)
-        rescue Exception => exception
+        rescue => exception
           @promise.reject(exception)
         end
       end
     end
     
-    def value(timeout=Dispatch::TIME_FOREVER)
-      @promise.sync(timeout)
-    end
-
-    def inspect
-      description.gsub(/Dispatch::Future/, "#{self.class} @state=#{self.state}")
-    end
-
   end
 end

@@ -1,6 +1,6 @@
 describe Dispatch::Promise do
   before do
-    @method = Kernel.method(:promise)
+    @method = Dispatch::Promise.method(:new)#Kernel.method(:promise)
   end
 
   it "should inherit from BasicObject if available, and not otherwise" do

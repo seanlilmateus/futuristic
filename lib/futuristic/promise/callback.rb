@@ -1,6 +1,6 @@
 module Dispatch # Callback
   class Promise
-    class Callback # Callback
+    class Callback
       def initialize(promise, on_fulfill, on_reject, next_promise)
         @promise = promise
         @on_fulfill, @on_reject = on_fulfill, on_reject
@@ -39,8 +39,8 @@ module Dispatch # Callback
       end
 
       def assume_state(source, target)
-        on_fulfill = Proc.new { target.fulfill(source.value, source.backtrace) }
-        on_reject  = Proc.new { target.reject(source.reason, source.backtrace) }
+        on_fulfill = proc { target.fulfill(source.value, source.backtrace) }
+        on_reject  = proc { target.reject(source.reason, source.backtrace) }
 
         source.then(on_fulfill, on_reject)
       end

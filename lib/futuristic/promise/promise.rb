@@ -3,18 +3,17 @@ motion_require './progress'
 
 module Dispatch # Promise
   class Promise
-
     Error = Class.new(RuntimeError)
 
     include Progress
 
+    attr_reader :state, :value, :reason, :backtrace
+
     def initialize
       @state = :pending
-      @semaphore = Dispatch::Semaphore.new 0
       @callbacks = []
+      @semaphore = Semaphore.new 0
     end
-
-    attr_reader :state, :value, :reason, :backtrace
 
     def pending?
       @state == :pending
@@ -30,10 +29,14 @@ module Dispatch # Promise
 
     def then(on_fulfill = nil, on_reject = nil, &block)
       on_fulfill ||= block
-      next_promise = Dispatch::Promise.new
+      next_promise = Promise.new
 
       add_callback { Callback.new(self, on_fulfill, on_reject, next_promise) }
       next_promise
+    end
+
+    def catch(&block)
+      self.then(nil, block.to_proc)
     end
 
     def add_callback(&generator)
@@ -44,33 +47,29 @@ module Dispatch # Promise
       end
     end
 
-    def sync(time_out=Dispatch::TIME_FOREVER)
-      @semaphore.wait(time_out) if pending?
+    def sync
+      wait if pending?
       raise reason if rejected?
       value
     end
 
     def fulfill(value = nil, backtrace = nil)
       dispatch(backtrace) do
-        willChangeValueForKey('value')
+        @state = :fulfilled
         @value = value
-        didChangeValueForKey('value')
-        change_state_to :fulfilled
       end
     end
 
     def reject(reason = nil, backtrace = nil)
       dispatch(backtrace) do
-        change_state_to :rejected
-        willChangeValueForKey('reason')
+        @state = :rejected
         @reason = reason || Error
-        didChangeValueForKey('reason')
       end
     end
 
-    def dispatch(backtrace, &block)
+    def dispatch(backtrace)
       if pending?
-        block.call
+        yield
         @backtrace = backtrace || caller
         @callbacks.each { |generator| dispatch!(generator.call) }
       end
@@ -86,17 +85,11 @@ module Dispatch # Promise
     def defer
       yield
     end
-
-    def inspect
-      description.gsub(/Dispatch::Promise/, "#{self.class} @state=#{self.state}")
-    end
-
+    
     private
-
-    def change_state_to(new_state)
-      willChangeValueForKey('state')
-      @state = new_state
-      didChangeValueForKey('state')
+    
+    def wait(time_out=Dispatch::TIME_FOREVER)
+      @semaphore.wait(time_out) if pending?
     end
   end
 end
