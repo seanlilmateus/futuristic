@@ -16,7 +16,7 @@ module Dispatch # Channel
       end
       promise.sync
     end
-
+    
     def take
       if @queue.empty?
         promise = Promise.new
@@ -27,7 +27,7 @@ module Dispatch # Channel
       promise
     end
     alias recv take
-
+    
     def put(value)
       if @pending.empty?
         promise = Promise.new
@@ -39,7 +39,7 @@ module Dispatch # Channel
       promise
     end
     alias << put
-
+    
     def drain(error)
       until @queue.empty?
         promise = @queue.pop
@@ -52,5 +52,6 @@ module Dispatch # Channel
       end
       self
     end
+    
   end
 end
